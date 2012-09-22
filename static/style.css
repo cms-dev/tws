@@ -17,10 +17,41 @@
 
 body {
     overflow-y: scroll;
-    padding-bottom: 40px;
 }
 
-form.login input[name="username"] {
+.login_container {
+    padding: 20px 0;
+    margin: 0;
+}
+
+.login_box {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+@media (min-height: 108px) {
+    body {
+        padding-bottom: 40px;
+    }
+
+    .login_container {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        padding: 20px;
+    }
+
+    .login_box {
+        margin-top: -54px;
+    }
+}
+
+.login_container form {
+    margin-bottom: 0;
+}
+
+.login_container form input[name="username"] {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     border-bottom-right-radius: 0;
@@ -30,12 +61,12 @@ form.login input[name="username"] {
     width: 35%;
 }
 
-form.login input[name="username"]:focus {
+.login_container form input[name="username"]:focus {
     position: relative;
     z-index: 1;
 }
 
-form.login input[name="password"] {
+.login_container form input[name="password"] {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     border-radius: 0;
@@ -44,12 +75,12 @@ form.login input[name="password"] {
     width: 35%;
 }
 
-form.login input[name="password"]:focus {
+.login_container form input[name="password"]:focus {
     position: relative;
     z-index: 1;
 }
 
-form.login input[type="submit"] {
+.login_container form input[type="submit"] {
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
     width: 30%;

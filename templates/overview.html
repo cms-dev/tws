@@ -25,11 +25,17 @@ lang_names = {% raw json_encode(lang_names) %};
 $(function () {
     init();
 });
+{% elif login_error %}
+$(function () {
+    add_notification("danger", "Login error");
+});
 {% end %}
         </script>
     </head>
     <body>
 {% if current_user is None %}
+        <div id="notifications"></div>
+
         <div class="login_container">
             <div class="login_box"
                 ><form method="POST" action="/login" class="well form-inline"

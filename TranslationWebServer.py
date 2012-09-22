@@ -102,7 +102,8 @@ class MainHandler(BaseHandler):
                     global_team=team,
                     global_teams=teams, global_tasks=tasks,
                     lang_names=lang_names, team_names=team_names,
-                    teams_to_langs=teams_to_langs)
+                    teams_to_langs=teams_to_langs,
+                    login_error=bool(self.get_argument("login_error", "")))
 
 
 class LoginHandler(BaseHandler):
@@ -115,12 +116,12 @@ class LoginHandler(BaseHandler):
 
         if username not in teams:
             logger.warn("Wrong username (%s / %s)." % (username, password))
-            self.redirect("/")
+            self.redirect("/?login_error=1")
             return
 
         if teams[username]["password"] != password:
             logger.warn("Wrong password (%s / %s)." % (username, password))
-            self.redirect("/")
+            self.redirect("/?login_error=1")
             return
 
         self.set_secure_cookie("login", username, expires_days=None)

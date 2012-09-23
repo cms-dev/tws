@@ -158,7 +158,7 @@ class MessageProxy(object):
                   '\n' % (timestamp, event, data)
         for client in self.clients:
             client(message, target)
-        self.buffer.append((timestamp, message))
+        self.buffer.append((timestamp, message, target))
 
     def add_callback(self, callback):
         self.clients.append(callback)
@@ -235,12 +235,12 @@ class EventHandler(BaseHandler):
                 self.send_event("id: %0.6f\n" \
                                 "event: select\n" \
                                 "data: %s %s %s\n" \
-                                "\n" % (timestamp, s[0], s[1], s[2]), '*')
+                                "\n" % (timestamp, s[0], s[1], s[2]), self.current_user)
         else:
             sent = False
-            for t, msg in proxy.buffer:
+            for t, message, target in proxy.buffer:
                 if t > last_id:
-                    self.send_event(msg, '*')
+                    self.send_event(message, target)
                     sent = True
             if sent and self.one_shot:
                 self.finish()

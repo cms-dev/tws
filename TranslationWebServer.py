@@ -186,7 +186,7 @@ class EventHandler(BaseHandler):
         # The EventSource polyfill will only deliver events once the
         # connection has been closed, so we have to finish the request
         # right after the first message has been sent. This custom
-        # header allows us to identify the request from the polyfill.
+        # header allows us to identify the requests from the polyfill.
         self.one_shot = False
         if 'X-Requested-With' in self.request.headers and \
                 self.request.headers['X-Requested-With'] == 'XMLHttpRequest':
@@ -234,16 +234,20 @@ class EventHandler(BaseHandler):
                           "data: %s %s %s\n" \
                           "\n" % (timestamp, s[0], s[1], s[2]), '*')
         else:
+            sent = False
             for t, msg in proxy.buffer:
                 if t > last_id:
                     self.send(msg, '*')
+                    sent = True
+            if sent and self.one_shot:
+                self.finish()
+                return
 
         proxy.add_callback(self.send)
 
         # FIXME put the timeout (i.e. 600) in a better location
         self.timeout = IOLoop.instance().add_timeout(
             time.time() + 600, self.finish)
-
 
     # If the connection is closed by the client then the "on_connection_
     # _close" callback is called. If we decide to finish the request (by

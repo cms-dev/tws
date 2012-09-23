@@ -215,6 +215,9 @@ class EventHandler(BaseHandler):
             # having processed the event we sent it.
             if self.one_shot:
                 self.finish()
+                # Not calling .clean() because there's nothing to be
+                # cleaned yet and because it would have no effect,
+                # since self.outdated == True.
             else:
                 self.flush()
             return
@@ -241,34 +244,43 @@ class EventHandler(BaseHandler):
                     sent = True
             if sent and self.one_shot:
                 self.finish()
+                # Not calling .clean() because there's nothing to be
+                # cleaned yet
                 return
 
         proxy.add_callback(self.send)
 
+        def callback():
+            self.finish()
+            self.clean()
+
         # FIXME put the timeout (i.e. 600) in a better location
         self.timeout = IOLoop.instance().add_timeout(
-            time.time() + 600, self.finish)
+            time.time() + 600, callback)
 
     # If the connection is closed by the client then the "on_connection_
     # _close" callback is called. If we decide to finish the request (by
     # calling the finish() method) then the "on_finish" callback gets
     # called (and "on_connection_close" *won't* be called!).
 
-    def on_connection_close(self):
+    def clean(self):
         if not self.outdated:
             proxy.remove_callback(self.send)
             IOLoop.instance().remove_timeout(self.timeout)
 
-    def on_finish(self):
-        if not self.outdated:
-            proxy.remove_callback(self.send)
-            IOLoop.instance().remove_timeout(self.timeout)
+    def on_connection_close(self):
+        self.clean()
+
+    # TODO As soon as we start supporting only Tornado 2.2+ use the
+    # .on_finish() callback to call .clean() instead of doing it after
+    # every call to .finish().
 
     def send(self, message, target):
         if target == '*' or target == self.current_user:
             self.write(message)
             if self.one_shot:
                 self.finish()
+                self.clean()
             else:
                 self.flush()
 

@@ -227,20 +227,20 @@ class EventHandler(BaseHandler):
             for task in tasks:
                 for lang in tasks[task]["langs"]:
                     for team in tasks[task]["langs"][lang]:
-                        self.send("id: %0.6f\n" \
-                                  "event: create\n" \
-                                  "data: %s %s %s\n" \
-                                  "\n" % (timestamp, team, lang, task), '*')
+                        self.send_event("id: %0.6f\n" \
+                                        "event: create\n" \
+                                        "data: %s %s %s\n" \
+                                        "\n" % (timestamp, team, lang, task), '*')
             for s in teams[self.current_user]["selected"]:
-                self.send("id: %0.6f\n" \
-                          "event: select\n" \
-                          "data: %s %s %s\n" \
-                          "\n" % (timestamp, s[0], s[1], s[2]), '*')
+                self.send_event("id: %0.6f\n" \
+                                "event: select\n" \
+                                "data: %s %s %s\n" \
+                                "\n" % (timestamp, s[0], s[1], s[2]), '*')
         else:
             sent = False
             for t, msg in proxy.buffer:
                 if t > last_id:
-                    self.send(msg, '*')
+                    self.send_event(msg, '*')
                     sent = True
             if sent and self.one_shot:
                 self.finish()
@@ -248,7 +248,7 @@ class EventHandler(BaseHandler):
                 # cleaned yet
                 return
 
-        proxy.add_callback(self.send)
+        proxy.add_callback(self.send_event)
 
         def callback():
             self.finish()
@@ -265,7 +265,7 @@ class EventHandler(BaseHandler):
 
     def clean(self):
         if not self.outdated:
-            proxy.remove_callback(self.send)
+            proxy.remove_callback(self.send_event)
             IOLoop.instance().remove_timeout(self.timeout)
 
     def on_connection_close(self):
@@ -275,7 +275,7 @@ class EventHandler(BaseHandler):
     # .on_finish() callback to call .clean() instead of doing it after
     # every call to .finish().
 
-    def send(self, message, target):
+    def send_event(self, message, target):
         if target == '*' or target == self.current_user:
             self.write(message)
             if self.one_shot:

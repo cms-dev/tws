@@ -313,16 +313,19 @@ class TranslationHandler(StaticFileHandler):
     @authenticated
     def post(self, team, lang, task):
         if team != self.current_user:
-            logger.warn("Team %s said to be %s while uploading translation of %s in %s." % (self.current_user, team, task, lang))
+            logger.warn("Team %s said to be %s while creating translation of %s in %s." % (self.current_user, team, task, lang))
             raise HTTPError(403)
 
         if lang not in lang_names:
+            logger.warn("Team %s tried to create a translation in %s" % (team, lang))
             raise HTTPError(404)
 
         if task not in tasks:
+            logger.warn("Team %s tried to create a translation of %s" % (team, task))
             raise HTTPError(404)
 
         if lang in teams[team]["tasks"].get(task, []):
+            logger.warn("Team %s tried to create a translation that already exists (%s into %s)" % (team, task, lang))
             raise HTTPError(405)
 
         self._save(team, lang, task)
@@ -333,10 +336,11 @@ class TranslationHandler(StaticFileHandler):
     @authenticated
     def put(self, team, lang, task):
         if team != self.current_user:
-            logger.warn("Team %s said to be %s while uploading translation of %s in %s." % (self.current_user, team, task, lang))
+            logger.warn("Team %s said to be %s while updating translation of %s in %s." % (self.current_user, team, task, lang))
             raise HTTPError(403)
 
         if lang not in teams[team]["tasks"].get(task, []):
+            logger.warn("Team %s tried to update a translation that doesn't exists (%s in %s)" % (team, task, lang))
             raise HTTPError(404)
 
         self._save(team, lang, task)
@@ -422,6 +426,7 @@ class TranslationHandler(StaticFileHandler):
             raise HTTPError(403)
 
         if lang not in teams[team]["tasks"].get(task, []):
+            logger.warn("Team %s tried to delete a translation that doesn't exists (%s in %s)" % (team, task, lang))
             raise HTTPError(404)
 
         logger.info("Team %s deleted translation of task %s into %s" % (team, task, lang))

@@ -62,7 +62,7 @@ $(function () {
                             <ul class="nav">
 {% for i, task in enumerate(task_list) %}
                                 <li{% if i == 0 %} class="active"{% end %}>
-                                    <a href="#tab_{{ task }}" data-toggle="tab">
+                                    <a href="#tab_{{ task }}" data-toggle="tab" data-task="{{ task }}">
                                         {{ task }}
                                     </a>
                                 </li>

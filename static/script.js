@@ -131,7 +131,13 @@ function init () {
     $('ul.nav li a[data-toggle="tab"]').on('shown', function (evt) {
         var str = $(evt.target).attr("href");
         current_task = str.substr(str.indexOf("_") + 1);
+        window.location.hash = current_task;
     });
+
+    if (window.location.hash.substring(1) in task_names) {
+        current_task = window.location.hash.substring(1);
+        $(".navbar ul.nav [data-task=" + current_task + "]").tab("show");
+    }
 
     $('.navbar a.btn-mini').popover({
         'html': true,

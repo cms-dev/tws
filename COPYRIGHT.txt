@@ -1,0 +1,41 @@
+Format: http://dep.debian.net/deps/dep5/
+Upstream-Name: TWS
+Upstream-Contact: CMS Mailing List <contestms@freelists.org>
+Source: http://github.com/cms-dev/tws
+Copyright: 2012 Luca Wehrstedt <luca.wehrstedt@gmail.com>
+License: AGPL-3+
+
+License: AGPL-3+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Affero General Public License for more details.
+ .
+ You should have received a copy of the GNU Affero General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+Files: *
+Copyright: 2012 Luca Wehrstedt <luca.wehrstedt@gmail.com>
+License: AGPL-3+
+
+Files: flags/*
+Copyright: public domain
+License: public-domain
+
+Files: static/js/jquery.js
+Copyright: 2012 jQuery Foundation and other contributors, http://jquery.org/
+License: Expat or GPL-2
+Comment: See http://jquery.org/license
+
+Files: static/css/bootstrap.css
+       static/css/bootstrap-responsive.css
+       static/img/glyphicons-halflings.png
+       static/img/glyphicons-halflings-white.png
+       static/js/bootstrap.js
+Copyright: 2012 Twitter, Inc.
+License: Apache-2.0

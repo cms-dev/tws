@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+{% set task_list = list(k for v, k in sorted((v["num"], k) for k, v in global_tasks.iteritems())) %}
+    <head>
+        <meta charset='utf-8'/>
+        <title>IOI 2012</title>
+        <script type="text/javascript" src="{{ static_url("js/jquery.js") }}"></script>
+        <script type="text/javascript" src="{{ static_url("js/bootstrap.js") }}"></script>
+        <script type="text/javascript" src="{{ static_url("script.js") }}"></script>
+        <link rel="stylesheet" href="{{ static_url("css/bootstrap.css") }}">
+        <link rel="stylesheet" href="{{ static_url("style.css") }}">
+        <link rel="stylesheet" href="{{ static_url("css/bootstrap-responsive.css") }}">
+        <script>
+{% if current_user is not None %}
+current_team = {% raw json_encode(global_team) %};
+
+current_task = {% raw json_encode(task_list[0]) %};
+
+task_names = {% raw json_encode(dict((k, v["name"]) for k, v in global_tasks.iteritems())) %}
+
+team_names = {% raw json_encode(team_names) %};
+
+lang_names = {% raw json_encode(lang_names) %};
+
+$(function () {
+    init();
+});
+{% end %}
+        </script>
+    </head>
+    <body>
+{% if current_user is None %}
+        <div class="container">
+            <div class="row">
+                <div class="span6 offset3"
+                    ><form method="POST" action="/login" class="well form-inline login"
+                        ><input name="username" type="text" class="input-small" placeholder="Username"
+                        ><input name="password" type="password" class="input-small" placeholder="Password"
+                        ><input type="submit" class="btn btn-primary" value="Log in"
+                    ></form>
+                </div>
+            </div>
+        </div>
+{% else %}
+        <div id="notifications"></div>
+
+        <div class="container">
+            <div class="row">
+                <div class="span12">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <a class="brand">IOI 2012</a>
+                            <ul class="nav">
+{% for i, task in enumerate(task_list) %}
+                                <li{% if i == 0 %} class="active"{% end %}>
+                                    <a href="#tab_{{ task }}" data-toggle="tab">
+                                        {{ task }}
+                                    </a>
+                                </li>
+{% end %}
+                            </ul>
+                            <p class="navbar-text pull-right">
+                                Logged in as
+                                <a class="btn btn-mini" rel="popover">{{ current_user }}</a>
+                                <a class="btn btn-warning" href="/logout">Logout</a>
+                            </p>
+                        </div>
+                    </div>                
+                </div>
+
+                <div class="span12">
+{% for i, task in enumerate(task_list) %}
+<div class="tab_panel{% if i == 0 %} active{% end %}" id="tab_{{ task }}" data-task="{{ task }}">
+    <div class="page-header">
+        <h1>{{ global_tasks[task]["name"] }} <small>{{ task }}</small></h1>
+    </div>
+    <div class="row">
+    <div class="span6">
+        <div>
+            <h2>New translation</h2>
+            <div class="create_translation">
+                <form autocomplete="off">
+                    <select name="lang">
+                        <optgroup label="Suggested languages">
+        {% if len(teams_to_langs.get(global_team, [])) != 0 %}
+            {% for lang in sorted(teams_to_langs[global_team]) %}
+                            <option value="{{ lang }}">{{ lang_names[lang] }}</option>
+            {% end %}
+        {% else %}
+                            <option disabled>None</option>
+        {% end %}
+                        </optgroup> 
+                        <optgroup label="All languages">
+        {% for lang in sorted(lang_names) %}
+            {% if lang not in teams_to_langs[global_team] %}
+                            <option value="{{ lang }}">{{ lang_names[lang] }}</option>
+            {% end %}
+        {% end %}
+                        </optgroup>
+                    </select>
+                    <input type="file" name="statement"/>
+                    <button class="btn btn-primary create">Upload</button>
+                </form>
+            </div>
+            <h2>Your translations</h2>
+            <div class="update_translations">
+            </div>
+        </div>
+    </div>
+    <div class="span6">
+        <h2>All translations</h2>
+        <p>
+            The following table lists all the translations available at the moment.
+            During the contest, the contestants will have access to all of them.
+            Yet, the ones you select (using the checkboxes) will be highlighted for the contestants of your team.
+        </p>
+        <table class="all_translations table table-bordered table-striped">
+            <col class="sel"/>
+            <col class="lang"/>
+            <col class="team"/>
+            <col class="download"/>
+            <thead>
+                <tr>
+                    <th class="sel">
+                    </th>
+                    <th class="lang">
+                        Language
+                    </th>
+                    <th class="team">
+                        Translated by
+                    </th>
+                    <th class="download">
+                        Download
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+{% end %}
+                </div>
+            </div>
+        </div>
+{% end %}
+    </body>
+</html>

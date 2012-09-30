@@ -1,0 +1,214 @@
+/* Translation Web Server
+ * Copyright © 2012 Luca Wehrstedt <luca.wehrstedt@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+body {
+    overflow-y: scroll;
+    padding-bottom: 40px;
+}
+
+form.login input[name="username"] {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-bottom-right-radius: 0;
+    border-right: 0 none;
+    border-top-right-radius: 0;
+    height: 28px;
+    width: 35%;
+}
+
+form.login input[name="username"]:focus {
+    position: relative;
+    z-index: 1;
+}
+
+form.login input[name="password"] {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 0;
+    border-right: 0 none;
+    height: 28px;
+    width: 35%;
+}
+
+form.login input[name="password"]:focus {
+    position: relative;
+    z-index: 1;
+}
+
+form.login input[type="submit"] {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    width: 30%;
+    height: 28px;
+}
+
+.navbar {
+    margin-top: 20px;
+}
+
+.navbar .navbar-inner {
+    padding-right: 5px;
+}
+
+.navbar a.btn {
+    vertical-align: top;
+    margin-left: 8px;
+}
+
+.navbar a.btn.btn-mini {
+    margin-top: 8px;
+    margin-left: 4px;
+    outline: none;
+    font-size: 12px;
+}
+
+.popover .popover-inner .popover-content {
+    text-align: center;
+}
+
+.nav li a {
+    outline: none;
+}
+
+.tab_panel:not(.active) {
+    display: none;
+}
+
+#notifications {
+    position: fixed;
+    top: 20px;
+    width: 0;
+    right: 0;
+    bottom: 0;
+    overflow: visible;
+    z-index: 1;
+}
+
+#notifications .notification {
+    width: 160px;
+    float: right;
+    margin-right: 20px;
+    clear: both;
+}
+
+form {
+    margin: 0;
+}
+
+.page-header h1 small {
+    line-height: 40px;
+    float: right;
+}
+
+input[type="file"] {
+    font-size: 14px;
+}
+
+
+.create_translation {
+    margin-bottom: 40px;
+}
+
+.create_translation select {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0 0 5px;
+    outline: none;
+}
+
+.create_translation .create {
+    float: right;
+}
+
+
+
+.update_translations div.translation {
+    position: relative;
+    height: 72px;
+    margin-bottom: 40px;
+}
+
+.update_translations div.translation h3 {
+    display: inline-block;
+    float: left;
+    margin: 0;
+    line-height: 36px;
+}
+
+.update_translations div.translation .delete {
+    position: absolute;
+    right: 0;
+    top: 5px;
+}
+
+.update_translations div.translation input[type=file] {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
+.update_translations div.translation .update {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+
+
+.all_translations {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.all_translations col.sel {
+    width: 36px;
+}
+
+.all_translations col.lang {
+    width: auto;
+}
+
+.all_translations col.team {
+    width: auto;
+}
+
+.all_translations col.download {
+    width: 106px;
+}
+
+.all_translations tbody td.sel {
+    text-align: center;
+}
+
+.all_translations tbody td.sel input {
+    margin: 0;
+}
+
+.all_translations tbody td.download {
+    padding: 3px;
+}
+
+.all_translations tbody td.download a.btn {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.all_translations tbody tr[data-lang="en"][data-team="HSC"] {
+    font-weight: bold;
+}

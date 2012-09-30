@@ -396,7 +396,7 @@ function CreateTranslation (team, lang, task) {
         ' + team_names[team] + ' \
     </td> \
     <td class="download"> \
-        <a class="btn btn-success" href="/translations/' + team + '/' + lang + '/' + task + '">Download</a> \
+        <iframe src="/translations/' + team + '/' + lang + '/' + task + '/button"></iframe> \
     </td> \
 </tr>');
 

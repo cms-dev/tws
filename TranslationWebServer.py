@@ -556,6 +556,12 @@ class ImageHandler(RequestHandler):
             self.write(data.read())
 
 
+class ButtonHandler(RequestHandler):
+    def get(self, team, lang, task):
+        self.render("button.html",
+                    team=team, lang=lang, task=task)
+
+
 def main():
     application = Application([
         (r"/", MainHandler),
@@ -563,6 +569,7 @@ def main():
         (r"/logout", LogoutHandler),
         (r"/events", EventHandler),
         (r"/translations/([A-Za-z0-9_]+)/([A-Za-z0-9_]+)/([A-Za-z0-9_]+)", TranslationHandler),
+        (r"/translations/([A-Za-z0-9_]+)/([A-Za-z0-9_]+)/([A-Za-z0-9_]+)/button", ButtonHandler),
         (r"/selections/([A-Za-z0-9_]+)/([A-Za-z0-9_]+)/([A-Za-z0-9_]+)", SelectionHandler),
         (r"/flags/([A-Za-z0-9_]+)", ImageHandler, {
             'location': os.path.join(os.path.dirname(__file__), 'flags', '%s'),

@@ -234,10 +234,12 @@ input[type="file"] {
     padding: 3px;
 }
 
-.all_translations tbody td.download a.btn {
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+.all_translations tbody td.download iframe {
     width: 100%;
+    height: 30px
+    margin: 0 0 -6px;
+    border: 0;
+    padding: 0;
 }
 
 .all_translations tbody tr[data-lang="en"][data-team="HSC"] {

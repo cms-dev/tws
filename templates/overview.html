@@ -3,7 +3,7 @@
 {% set task_list = list(k for v, k in sorted((v["num"], k) for k, v in global_tasks.iteritems())) %}
     <head>
         <meta charset='utf-8'/>
-        <title>IOI 2012</title>
+        <title>IOI 2012 / Day 2</title>
         <script type="text/javascript" src="{{ static_url("js/jquery.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("js/bootstrap.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("script.js") }}"></script>
@@ -58,7 +58,7 @@ $(function () {
                 <div class="span12">
                     <div class="navbar">
                         <div class="navbar-inner">
-                            <a class="brand">IOI 2012</a>
+                            <a class="brand">IOI 2012 / Day 2</a>
                             <ul class="nav">
 {% for i, task in enumerate(task_list) %}
                                 <li{% if i == 0 %} class="active"{% end %}>

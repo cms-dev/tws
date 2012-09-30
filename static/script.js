@@ -353,7 +353,7 @@ function CreateOurTranslation (lang, task) {
 
     var found = false;
     $("#tab_" + task + " .update_translations div.translation").each(function () {
-        if (!found && $(this).data("lang") >= lang) {
+        if (!found && lang_names[$(this).data("lang")] >= lang_names[lang]) {
             found = true;
             box.insertBefore(this);
         }
@@ -402,7 +402,7 @@ function CreateTranslation (team, lang, task) {
 
     var found = false;
     $("#tab_" + task + " .all_translations tbody tr").each(function () {
-        if (!found && $(this).data("lang") >= lang || ($(this).data("lang") == lang && $(this).data("team") >= team)) {
+        if (!found && lang_names[$(this).data("lang")] >= lang_names[lang] || (lang_names[$(this).data("lang")] == lang_names[lang] && team_names[$(this).data("team")] >= team_names[team])) {
             found = true;
             row.insertBefore(this);
         }

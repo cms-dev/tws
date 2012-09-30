@@ -92,7 +92,7 @@ $(function () {
                     <select name="lang">
                         <optgroup label="Suggested languages">
         {% if len(teams_to_langs.get(global_team, [])) != 0 %}
-            {% for lang in sorted(teams_to_langs[global_team]) %}
+            {% for lang in sorted(teams_to_langs[global_team], key=lambda x: lang_names[x]) %}
                             <option value="{{ lang }}">{{ lang_names[lang] }}</option>
             {% end %}
         {% else %}
@@ -100,7 +100,7 @@ $(function () {
         {% end %}
                         </optgroup> 
                         <optgroup label="All languages">
-        {% for lang in sorted(lang_names) %}
+        {% for lang in sorted(lang_names, key=lambda x: lang_names[x]) %}
             {% if lang not in teams_to_langs[global_team] %}
                             <option value="{{ lang }}">{{ lang_names[lang] }}</option>
             {% end %}

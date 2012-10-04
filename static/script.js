@@ -129,6 +129,31 @@ function init () {
         var task = form.parents(".tab_panel").data("task");
         var file = $("[type=file]", form)[0].files[0];
 
+        var others = new Array();
+        $("#tab_" + task + " .all_translations tbody tr[data-lang=" + lang + "]").each(function () {
+            others.push(team_names[$(this).data("team")]);
+        });
+        if (others.length > 0) {
+            others.sort();
+            var msg = "";
+            for (var i = 0; i < others.length; i += 1) {
+                msg += others[i];
+                if (i == others.length - 2) {
+                    msg += " and ";
+                } else if (i < others.length - 2) {
+                    msg += ", ";
+                }
+            }
+            var msg = "\
+This task has alredy been translated into " + lang_names[lang] + " by " + msg + ". \
+Please avoid uploading again the same PDF file. Instead, you can select their translation \
+using the checkboxes in the table to have it highlighted for your contestants, too.\n\
+Are you sure you want to upload a new translation?";
+            if (!window.confirm(msg)) {
+                return;
+            }
+        }
+
         if (!file) {
             add_notification("danger", "No file selected");
         } else {

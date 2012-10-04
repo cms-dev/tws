@@ -72,9 +72,30 @@ function create_event_source () {
     }, false);
 };
 
+function update_network_status (state) {
+    $("#notifications .notification.connection").remove();
+    if (state == 0) { // self.es.CONNECTING
+        $("#ConnectionStatus_box").attr("data-status", "reconnecting");
+        $("#ConnectionStatus_text").text("You are disconnected from the server but your browser is trying to connect.");
+    } else if (state == 1) { // self.es.OPEN
+        $("#ConnectionStatus_box").attr("data-status", "connected");
+        $("#notifications").prepend('<div class="alert alert-success alert-block notification connection">' +
+                                    '<a class="close" data-dismiss="alert" href="#">×</a>' +
+                                    'You are connected to the server and are receiving live updates.' +
+                                    '</div>');
+    } else if (state == 2) { // self.es.CLOSED
+        $("#ConnectionStatus_box").attr("data-status", "disconnected");
+        $("#ConnectionStatus_text").html("You are disconnected from the server but you can <a onclick=\"DataStore.create_event_source();\">try to connect</a>.");
+    } else if (state == 3) { // "reload" event received
+        $("#ConnectionStatus_box").attr("data-status", "outdated");
+        $("#ConnectionStatus_text").html("Your local data cannot be updated. Please <a onclick=\"window.location.reload();\">reload the page</a>.");
+    }
+};
+
 function es_open_handler () {
     if (es.readyState == es.OPEN) {
         console.info("EventSource connected");
+        update_network_status(es.readyState);
     } else {
         console.error("EventSource shouldn't be in state " + es.readyState + " during a 'open' event!");
     }
@@ -83,8 +104,10 @@ function es_open_handler () {
 function es_error_handler () {
     if (es.readyState == es.CONNECTING) {
         console.info("EventSource reconnecting");
+        update_network_status(es.readyState);
     } else if (es.readyState == es.CLOSED) {
         console.info("EventSource disconnected");
+        update_network_status(es.readyState);
     } else {
         console.error("EventSource shouldn't be in state " + es.readyState + " during a 'error' event!");
     }
@@ -94,6 +117,7 @@ function es_reload_handler () {
     if (es.readyState == es.OPEN) {
         console.info("Received a 'reload' event");
         es.close();
+        update_network_status(3);
     } else {
         console.error("EventSource shouldn't be in state " + es.readyState + " during a 'reload' event!");
     }
@@ -117,6 +141,7 @@ function init () {
 
 
     create_event_source();
+    update_network_status(0);
 
 
     $(".create_translation").on("click", ".create", function (evt) {

@@ -192,11 +192,11 @@ def run(contest_id):
             team_path = os.path.join(team_dir, t)
             with open(team_path) as team_file:
                 data = json.load(team_file)
+                selected = list(str(v) for k, v in translation_map.iteritems() if k[2] in [official_team, team])
                 if "selected" in data:
-                    selected = list(str(translation_map[tuple(reversed(x))]) for x in data["selected"])
-                    selected.extend(str(v) for k, v in translation_map.iteritems() if k[2] in [official_team, team])
-                    selected = sorted(set(selected))
-                    session.execute("UPDATE users SET statements = '{%s}' WHERE username LIKE '%s%%';" % (','.join(selected), team))
+                    selected.extend(str(translation_map[tuple(reversed(x))]) for x in data["selected"])
+                selected = sorted(set(selected))
+                session.execute("UPDATE users SET statements = '{%s}' WHERE username LIKE '%s%%';" % (','.join(selected), team))
 
     session.commit()
 

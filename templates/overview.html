@@ -74,7 +74,7 @@ $(function () {
                                 <a class="btn btn-warning" href="/logout">Logout</a>
                             </p>
                         </div>
-                    </div>                
+                    </div>
                 </div>
 
                 <div class="span12">
@@ -98,7 +98,7 @@ $(function () {
         {% else %}
                             <option disabled>None</option>
         {% end %}
-                        </optgroup> 
+                        </optgroup>
                         <optgroup label="All languages">
         {% for lang in sorted(lang_names, key=lambda x: lang_names[x]) %}
             {% if lang not in teams_to_langs[global_team] %}

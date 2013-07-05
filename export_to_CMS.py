@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
 # Translation Web Server
-# Copyright © 2012 Luca Wehrstedt <luca.wehrstedt@gmail.com>
+# Copyright © 2012-2013 Luca Wehrstedt <luca.wehrstedt@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,7 @@ import os.path
 import json
 import re
 
-from ioi_to_iso2 import ioi_to_iso2
+from convert.ioi_to_iso2 import ioi_to_iso2
 from Teams import teams
 from Langs import langs
 
@@ -31,6 +31,7 @@ from cms.db.SQLAlchemyAll import Session, Contest, Statement
 from cms.db.FileCacher import FileCacher
 
 official_team = "HSC"
+ioi_to_iso2[official_team] = "official"
 
 def run(contest_id):
     session = Session()
@@ -57,7 +58,7 @@ def run(contest_id):
                             task_by_lang.add((task, lang, team))
 
     if task_by_team != task_by_lang:
-        print "ERROR: inconsistent data in task files"
+        print "ERROR: data in 'tasks' is not self-consistent"
         print repr(task_by_team - task_by_lang)
         print repr(task_by_lang - task_by_team)
         return
@@ -83,13 +84,13 @@ def run(contest_id):
                             team_by_lang.add((task, lang, team))
 
     if team_by_task != team_by_lang:
-        print "ERROR: inconsistent data in team files"
+        print "ERROR: data in 'teams' is not self-consistent"
         print repr(team_by_task - team_by_lang)
         print repr(team_by_lang - team_by_task)
         return
 
     if task_by_team != team_by_task:
-        print "ERROR: inconsistent data between task and team files"
+        print "ERROR: data in 'tasks' and 'teams' is different"
         print repr(task_by_team - team_by_task)
         print repr(team_by_task - task_by_team)
         return
@@ -111,25 +112,28 @@ def run(contest_id):
                 data_by_team.add((task, lang, team))
 
     if data_by_lang != data_by_team:
-        print "ERROR: inconsistent data in data files"
+        print "ERROR: PDF files in 'data' are not complete"
         print repr(data_by_lang - data_by_team)
         print repr(data_by_team - data_by_lang)
         return
 
     if task_by_team != data_by_lang:
-        print "ERROR: inconsistent data between json and data files"
+        print "ERROR: PDF files in 'data' do not match JSON data"
         print repr(task_by_team - data_by_lang)
         print repr(data_by_lang - task_by_team)
         return
 
-
-    translations = task_by_team
-
     print "Hooray! Data is consistent!"
 
 
-    translation_map = dict()
+    # Pick one at random: they're all equal.
+    translations = task_by_team
 
+    # Determine language codes used in CMS.
+    codes = dict()
+
+    # Read JSON files in 'tasks' again as it provides data already
+    # grouped as we need it, and not simply as a list of tuples.
     for t in os.listdir(task_dir):
         if t.endswith('.json'):
             task = t[:-5]
@@ -142,67 +146,64 @@ def run(contest_id):
                             pass
                         elif len(v) == 1 and v[0] != official_team:
                             for team in v:
-                                translation_map[(task, lang, team)] = "%s" % lang
+                                codes[(task, lang, team)] = "%s" % lang
                         else:
                             for team in v:
-                                translation_map[(task, lang, team)] = "%s_%s" % (lang, ioi_to_iso2[team])
+                                codes[(task, lang, team)] = "%s_%s" % (lang, ioi_to_iso2[team])
 
-
-    tasks = set(task for task, lang, team in translations)
-
-    task_map = dict((task, contest.get_task(task)) for task in tasks)
-
-
+    # Store the files as Statement objects.
     file_cacher = FileCacher()
 
     for task, lang, team in translations:
         if team == official_team:
             assert lang == "en"
             digest = file_cacher.put_file(
-                        path=os.path.join(data_dir, task, "by_lang", "%s (%s).pdf" % (lang, team)),
-                        description="Statement for task %s" % task)
+                path=os.path.join(data_dir, task, "by_lang", "%s (%s).pdf" % (lang, team)),
+                description="Statement for task %s" % task)
         else:
             digest = file_cacher.put_file(
-                        path=os.path.join(data_dir, task, "by_lang", "%s (%s).pdf" % (lang, team)),
-                        description="Statement for task %s, translated into %s (%s) by %s (%s)" %
+                path=os.path.join(data_dir, task, "by_lang", "%s (%s).pdf" % (lang, team)),
+                description="Statement for task %s, translated into %s (%s) by %s (%s)" %
                             (task, langs[lang], lang, teams[team], team))
 
-        s = Statement(digest, translation_map[(task, lang, team)], task_map[task])
+        s = Statement(codes[(task, lang, team)], digest, task=contest.get_task(task))
 
         session.add(s)
-        translation_map[(task, lang, team)] = s
 
     session.commit()
 
-    # FIXME doesn't seem to work
-    for task, lang, team in translations:
-        if team == official_team:
-            task_map[task].official_statement = translation_map[(task, lang, team)].language
 
-        translation_map[(task, lang, team)] = translation_map[(task, lang, team)].id
+    primary = dict()
 
-    session.commit()
-
-    print "Translations stored!"
-
-
+    # Retrieve the statements selected by each team.
     for t in os.listdir(team_dir):
         if t.endswith('.json'):
             team = t[:-5]
             team_path = os.path.join(team_dir, t)
             with open(team_path) as team_file:
                 data = json.load(team_file)
-                selected = list(str(v) for k, v in translation_map.iteritems() if k[2] in [official_team, team])
-                if "selected" in data:
-                    selected.extend(str(translation_map[tuple(reversed(x))]) for x in data["selected"])
-                selected = sorted(set(selected))
-                session.execute("UPDATE users SET statements = '{%s}' WHERE username LIKE '%s%%';" % (','.join(selected), team))
+
+                for team2, lang, task in data.get("selected", []):
+                    # A team could have selected a statement that later got removed.
+                    if (task, lang, team2) in codes:
+                        primary.setdefault(team, {}).setdefault(task, []).append(codes[(task, lang, team2)])
+
+    # Add the ones they uploaded themselves.
+    for task, lang, team in translations:
+        # Don't worry about duplicates, CWS filters them out.
+        primary.setdefault(team, {}).setdefault(task, []).append(codes[(task, lang, team)])
+
+    # Set the primary statements for tasks (i.e. the ones of the official team)
+    for task, primary2 in primary.get(official_team, {}).iteritems():
+        contest.get_task(task).primary_statements = json.dumps(primary2)
+
+    # Set the primary statements for teams
+    for team, primary2 in primary.iteritems():
+        session.execute("UPDATE users SET primary_statements = '%s' WHERE username LIKE '%s%%';" % (json.dumps(primary2), team))
 
     session.commit()
 
-    print "Selections stored!"
-
-    print "ALL DONE"
+    print "Statements stored in the DB!"
 
 
 if __name__ == "__main__":
